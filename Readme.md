@@ -32,8 +32,6 @@ PC-CCTV-KOTA.
 ### Ringkasan
 Topologi berbentuk **hub-and-spoke berhierarki** dengan R-PUSAT (Balai Kota) sebagai pusat, mengikuti Gambar 1 soal. Terdapat 8 router, 14 LAN, dan 6 link backbone (L1 sampai L6).
 
-![Topologi lengkap](images/01-topologi-lengkap.png)
-
 ### Langkah
 1. Letakkan 8 router: R-ISP, R-PUSAT, R-DC, R-BARAT, R-UTARA, R-TIMUR, R-SELATAN, R-PELABUHAN.
 2. Hubungkan backbone sesuai Gambar 1: R-PUSAT ke R-ISP, L1 (R-DC), L2 (R-UTARA), L3 (R-SELATAN), L4 (R-TIMUR), L5 (R-BARAT), serta L6 (R-UTARA ke R-PELABUHAN). Server 8.8.8.8 langsung ke R-ISP.
