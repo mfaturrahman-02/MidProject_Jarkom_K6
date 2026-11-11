@@ -8,7 +8,7 @@
 | Dea Chrisna Butarbutar | 5027251035 |
 | Muhammad Faturrahman | 5027241065 |
 
-# soal 1
+# Soal 1
 ```
 1. Perancangan topologi (10)
 # Bangun topologi di Cisco Packet Tracer sesuai skema yang kalian pilih (VLSM atau
@@ -86,7 +86,123 @@ Topologi berbentuk **hub-and-spoke berhierarki** dengan R-PUSAT (Balai Kota) seb
 - ![](asset/01-topologi-pusat.png) 
 - ![](asset/01-modul-router.png)
 - ![](asset/01-label-lan.png)
-# soal 4
+
+# Soal 2
+```
+2. Tabel subnetting (5)
+Menggunakan VLSM dan CIDR, buat tabel di spreadsheet yang berisi nama subnet, network ID, prefix, rentang host, alamat broadcast, dan gateway untuk setiap subnet sesuai dengan lembar jawaban UTS.
+Kesalahan hitung di UTS boleh diperbaiki, tetapi perbaikan wajib dicatat dalam tabel revisi: subnet, jawaban di UTS, perbaikan, dan alasan kesalahannya. Perubahan yang tidak dicatat dianggap sebagai “ketidakkonsistenan”.
+```
+
+## VLSM
+Berikut ini adalah perhitungan menggunakan metode VLSM.
+
+![alt text](/asset/02-VLSM.png)
+
+Metode VLSM dilakukan dengan mengurutkan kebutuhan host setiap subnet dari yang terbesar ke terkecil. Tiap subnet diberi prefix terpanjang yang masih mencukupi jumlah host-nya, lalu dialokasikan secara berurutan mulai dari alamat pertama blok induk. Subnet berikutnya dimulai tepat setelah alamat broadcast subnet sebelumnya, sehingga tidak ada blok yang bertumpuk dan sisa alamat yang terbuang sedikit. 
+
+### 1. Prefix
+Perhitungan prefix dilakukan dengan menghitung kebutuhan host terlebih dahulu.
+
+Contoh perhitungan pada Wifi Publik Utara:
+
+- Host = 11000 host
+- Kebutuhan host = host + 2 -> 11000 + 2 = 11002 host
+- Cari n yang -> 2ⁿ − 2 ≥ kebutuhan host
+- Untuk n = 14 -> 2¹⁴ - 2 ≥ 883 (cukup)
+- Prefix = 32 - n -> 32 - 14 = 18
+Maka, prefix yang didapat adalah /18.
+
+### 2. Network ID
+Network ID adalah IP address awal yang mewakili subnet Wifi Publik Utara. Ini adalah subnet pertama pada blok 10.48.0.0, maka NID adalah 10.48.0.0.
+
+### 3. Broadcast Address
+Broadcast address adalah IP setelah range IP yang digunakan. Range IPnya berada pada 10.48.0.1 - 10.48.63.254, maka broadcast addressnya adalah 10.48.63.255.
+
+### 4. Range Host
+Range IP dimulai dari alamat setelah Network ID sampai dengan sebelum broadcast address, yaitu 10.48.0.1 - 10.48.63.254.
+
+## CIDR
+Berikut ini adalah perhitungan menggunakan metode VLSM.
+
+![alt text](02-CIDR.png)
+
+Penggabungan dilakukan pada subnet yang berdekatan dalam topologi, yaitu LAN dengan link router-nya. Jika kedua subnet memiliki prefix yang sama, keduanya digabung menjadi satu blok dengan prefix yang lebih pendek satu bit. Jika prefix-nya berbeda, diambil blok yang lebih besar, lalu prefix-nya diperpendek satu bit. Proses ini diulang hingga seluruh subnet menyatu menjadi satu blok induk.
+
+# Soal 3
+```
+3. Static routing (15)
+Seluruh LAN dapat saling berkomunikasi hanya dengan static route (dan default route untuk arah keluar).
+Default route hanya boleh mengarah ke router di atasnya / keluar. Misalnya, default route R-DC ke R-PUSAT, R-PELABUHAN ke R-UTARA, dan R-PUSAT ke R-ISP.
+R-PUSAT dan R-UTARA wajib memiliki static route ke jaringan di bawahnya (ke dalam):
+R-PUSAT: ke semua LAN milik R-DC, R-UTARA, R-PELABUHAN, R-SELATAN, R-TIMUR, dan R-BARAT.
+R-UTARA: ke semua LAN milik R-PELABUHAN.
+```
+Mengonfigurasi static route dan default route pada seluruh router sehingga semua LAN dapat saling berkomunikasi tanpa routing dinamis.
+
+R-PUSAT (Balai Kota) menjadi pusat yang terhubung langsung ke R-ISP dan lima router cabang. R-PELABUHAN tidak terhubung langsung ke R-PUSAT, melainkan melalui R-UTARA, sehingga R-UTARA menjadi router perantara.
+
+## Tabel Link Antar Router
+
+| Link | Router A | Interface A | IP A | Router B | Interface B | IP B | Network |
+|---|---|---|---|---|---|---|---|
+| L1 | R-PUSAT | Se0/3/0 | 10.48.33.1 | R-DC | Se0/3/0 | 10.48.33.2 | 10.48.33.0/30 |
+| L2 | R-PUSAT | Se0/3/1 | 10.48.97.1 | R-BARAT | Se0/3/0 | 10.48.97.2 | 10.48.97.0/30 |
+| L3 | R-PUSAT | Se0/2/1 | 10.49.36.1 | R-TIMUR | Se0/3/0 | 10.49.36.2 | 10.49.36.0/30 |
+| L4 | R-PUSAT | Se0/1/0 | 10.49.96.129 | R-SELATAN | Se0/3/0 | 10.49.96.130 | 10.49.96.128/30 |
+| L5 | R-PUSAT | Se0/2/0 | 10.48.194.1 | R-UTARA | Se0/3/0 | 10.48.194.2 | 10.48.194.0/30 |
+| L6 | R-UTARA | Gi0/2 | 10.49.160.129 | R-PELABUHAN | Gi0/0 | 10.49.160.130 | 10.49.160.128/30 |
+| ISP | R-PUSAT | Gi0/0 | 203.0.113.25 | R-ISP | Gi0/1 | 203.0.113.26 | 203.0.113.24/30 |
+
+## Tabel LAN per Router
+
+| Router | Interface | LAN | Network | Gateway |
+|---|---|---|---|---|
+| R-PUSAT | Gi0/1 | Pegawai Balai Kota | 10.49.192.0/21 | 10.49.192.1 |
+| R-PUSAT | Gi0/2 | Server Balai Kota | 10.49.200.0/27 | 10.49.200.1 |
+| R-DC | Gi0/1 | CCTV Kota | 10.48.0.0/19 | 10.48.0.1 |
+| R-DC | Gi0/2 | Server & Storage DC | 10.48.32.0/24 | 10.48.32.1 |
+| R-BARAT | Gi0/1 | WiFi Publik Barat | 10.48.64.0/19 | 10.48.64.1 |
+| R-BARAT | Gi0/2 | Puskesmas & Sekolah Barat | 10.48.96.0/24 | 10.48.96.1 |
+| R-UTARA | Gi0/0 | WiFi Publik Utara | 10.48.128.0/18 | 10.48.128.1 |
+| R-UTARA | Gi0/1 | Sensor Lalu Lintas Utara | 10.48.192.0/23 | 10.48.192.1 |
+| R-TIMUR | Gi0/1 | WiFi Publik Timur | 10.49.0.0/19 | 10.49.0.1 |
+| R-TIMUR | Gi0/2 | Sensor Banjir Timur | 10.49.32.0/22 | 10.49.32.1 |
+| R-SELATAN | Gi0/2 | WiFi Publik Selatan | 10.49.64.0/19 | 10.49.64.1 |
+| R-SELATAN | Gi0/1 | PJU Pintar Selatan | 10.49.96.0/25 | 10.49.96.1 |
+| R-PELABUHAN | Gi0/1 | Sensor & SCADA Pelabuhan | 10.49.128.0/19 | 10.49.128.1 |
+| R-PELABUHAN | Gi0/2 | Kantor Pelabuhan | 10.49.160.0/25 | 10.49.160.1 |
+
+### STATIC ROUTE
+
+Router cabang cukup memakai default route ke router di atasnya karena seluruh tujuan lain berada di balik R-PUSAT. R-PUSAT dan R-UTARA, sebagai router yang memiliki jaringan di bawahnya, memerlukan static route ke setiap LAN tersebut.
+
+| Router | Tujuan | Next Hop | Keterangan |
+|---|---|---|---|
+| R-PUSAT | 0.0.0.0/0 | 203.0.113.26 | Default ke R-ISP |
+| R-PUSAT | 10.48.0.0/19 | 10.48.33.2 | LAN R-DC |
+| R-PUSAT | 10.48.32.0/24 | 10.48.33.2 | LAN R-DC |
+| R-PUSAT | 10.48.64.0/19 | 10.48.97.2 | LAN R-BARAT |
+| R-PUSAT | 10.48.96.0/24 | 10.48.97.2 | LAN R-BARAT |
+| R-PUSAT | 10.49.0.0/19 | 10.49.36.2 | LAN R-TIMUR |
+| R-PUSAT | 10.49.32.0/22 | 10.49.36.2 | LAN R-TIMUR |
+| R-PUSAT | 10.49.64.0/19 | 10.49.96.130 | LAN R-SELATAN |
+| R-PUSAT | 10.49.96.0/25 | 10.49.96.130 | LAN R-SELATAN |
+| R-PUSAT | 10.48.128.0/18 | 10.48.194.2 | LAN R-UTARA |
+| R-PUSAT | 10.48.192.0/23 | 10.48.194.2 | LAN R-UTARA |
+| R-PUSAT | 10.49.128.0/19 | 10.48.194.2 | LAN R-PELABUHAN (via R-UTARA) |
+| R-PUSAT | 10.49.160.0/25 | 10.48.194.2 | LAN R-PELABUHAN (via R-UTARA) |
+| R-PUSAT | 10.49.160.128/30 | 10.48.194.2 | Link L6, agar endpoint tunnel GRE terjangkau |
+| R-UTARA | 0.0.0.0/0 | 10.48.194.1 | Default ke R-PUSAT |
+| R-UTARA | 10.49.128.0/19 | 10.49.160.130 | LAN R-PELABUHAN |
+| R-UTARA | 10.49.160.0/25 | 10.49.160.130 | LAN R-PELABUHAN |
+| R-DC | 0.0.0.0/0 | 10.48.33.1 | Default ke R-PUSAT |
+| R-BARAT | 0.0.0.0/0 | 10.48.97.1 | Default ke R-PUSAT |
+| R-TIMUR | 0.0.0.0/0 | 10.49.36.1 | Default ke R-PUSAT |
+| R-SELATAN | 0.0.0.0/0 | 10.49.96.129 | Default ke R-PUSAT |
+| R-PELABUHAN | 0.0.0.0/0 | 10.49.160.129 | Default ke R-UTARA |
+
+# Soal 4
 ```
 4. DHCP (10)
 . Interface router dan seluruh server menggunakan IP statis.
@@ -95,7 +211,6 @@ gateway dan DNS server (soal 8), tanpa bentrok dengan alamat IP statis.
 . Khusus untuk subnet CCTV Kota (subnet R-DC) mendapatkan alamat dari server
 DHCP di LAN Server dan Storage DC, bukan dari router.
 ```
-
 
 ## 4. DHCP
 
@@ -239,6 +354,115 @@ DHCP CCTV dipusatkan di server sesuai syarat soal, dan relay dipakai karena broa
 - ![](asset/04-ipconfig-pc.png)
 - ![](asset/04-dhcp-binding.png)
 
+# Soal 5
+```
+NAT (5). Seluruh host dapat mengakses server 8.8.8.8 menggunakan satu IP publik milik R-PUSAT. R-ISP tidak boleh memiliki rute ke alamat privat internal.
+```
+## Rancangan 
+
+| Komponen | Nilai |
+|---|---|
+| Router NAT | R-PUSAT |
+| Interface outside | Gi0/0 (203.0.113.25/30) |
+| Interface inside | Gi0/1, Gi0/2, Se0/1/0, Se0/2/0, Se0/2/1, Se0/3/0, Se0/3/1 |
+| Alamat privat yang di-NAT | 10.48.0.0/15 (mencakup 10.48.x.x dan 10.49.x.x) |
+| Jenis NAT | PAT (overload) ke IP interface Gi0/0 |
+| IP publik | 203.0.113.25 |
+| Next hop ke ISP | 203.0.113.26 |
+| Server tujuan | 8.8.8.8 (R-ISP Gi0/0: 8.8.8.1/24) |
+
+ACL `10.48.0.0 0.1.255.255` dipilih satu entri karena seluruh LAN dan link antar router berada di rentang 10.48.0.0 sampai 10.49.255.255. Dengan PAT, ribuan host berbagi satu IP publik dengan port sumber yang berbeda.
+
+### Konfigurasi R-PUSAT
+
+```
+configure terminal
+access-list 1 permit 10.48.0.0 0.1.255.255
+interface GigabitEthernet0/0
+ip nat outside
+exit
+interface GigabitEthernet0/1
+ip nat inside
+exit
+interface GigabitEthernet0/2
+ip nat inside
+exit
+interface Serial0/1/0
+ip nat inside
+exit
+interface Serial0/2/0
+ip nat inside
+exit
+interface Serial0/2/1
+ip nat inside
+exit
+interface Serial0/3/0
+ip nat inside
+exit
+interface Serial0/3/1
+ip nat inside
+exit
+ip nat inside source list 1 interface GigabitEthernet0/0 overload
+ip route 0.0.0.0 0.0.0.0 203.0.113.26
+end
+write memory
+```
+![alt text](asset/05-config-r-pusat.png)
+
+### Konfigurasi R-ISP
+
+R-ISP hanya memiliki jaringan connected (8.8.8.0/24 dan 203.0.113.24/30). Tidak ada static route maupun routing dinamis ke jaringan 10.x.
+
+```
+configure terminal
+no router rip
+end
+write memory
+```
+
+Paket balasan dari 8.8.8.8 tetap sampai karena tujuannya 203.0.113.25, yang berada pada jaringan connected R-ISP.
+
+![alt text](asset/05-config-r-isp.png)
+![alt text](asset/05-r-isp.png)
+
+#### 2. Ping ke 8.8.8.8 dari seluruh host
+
+1. PC-PEGAWAI-BALAIKOTA
+![PC-PEGAWAI-BALAIKOTA](asset/05-pgw-balaikota.png)
+
+2. SRV-BALAIKOTA - 10.49.200.0/27
+![SRV-BALAIKOTA](asset/05-srv-balaikota.png)
+
+3. PC-CCTV-KOTA - 10.48.0.0/19 
+![CCTV-KOTA](asset/05-cctv-kota.png)
+
+4. SRV-DC - 10.48.32.0/24
+![SRV-DC](asset/05-srv-dc.png)
+
+5. PC-PUSKESMAS-BARAT - 10.48.96.0/24
+![PUSKESMAS-BARAT](asset/05-puskesmas-barat.png)
+
+6. PC-SENSOR-LANTAS-UTARA - 10.48.192.0/23
+![SENSOR-LANTAS-UTARA](asset/05-sensor-lantas-utara.png)
+
+7. PC-SENSOR-BANJIR-TIMUR - 10.49.32.0/22
+![SENSOR-BANJIR-TIMUR](asset/05-sensor-banjir-timur.png)
+
+8. PC-PJU-SELATAN - 10.49.96.0/25
+![PJU-SELATAN](asset/05-pju-selatan.png)
+
+9. PC-SCADA-PELABUHAN - 10.49.128.0/19
+![SCADA-PELABUHAN](asset/05-scada-pelabuhan.png)
+
+10. PC-KANTOR-PELABUHAN - 10.49.160.0/25
+![KANTOR-PELABUHAN](asset/05-kantor-pelabuhan.png)
+
+R-ISP tidak dapat melakukan ping ke jaringan internal:
+![alt text](asset/05-r-isp-internal.png)
+
+- Seluruh host dapat keluar karena static route (soal 3) membawa paket mereka ke R-PUSAT lewat default route, lalu R-PUSAT menerjemahkan alamat sumbernya.
+- Paket ke 8.8.8.8 keluar dengan sumber 203.0.113.25, sehingga R-ISP tidak perlu mengetahui alamat privat sama sekali.
+
 # Soal 6
 ```
 6. Tunnel GRE (10)
@@ -339,6 +563,193 @@ Packet Tracer tidak menyediakan `mode transport`, sehingga IPsec berjalan di mod
 - ![](asset/06-label-tunnel.png)
 
 ---
+
+# Soal 7
+```
+Dynamic routing OSPF (10). Kerjakan di file terpisah (copy file utama).
+Tambahkan link baru (cadangan) L7 antara R-DC dan R-UTARA. Berikan alamat yang belum digunakan.
+Ganti seluruh static route antar-router dengan OSPF. Ketentuannya:
+Router tidak mengirim pesan OSPF ke arah LAN pengguna.
+Default route ke internet hanya dikonfigurasi di R-PUSAT, dan router lain mendapatkannya secara otomatis melalui OSPF.
+Jika salah satu link backbone putus, konektivitas harus pulih secara otomatis melalui jalur lain.
+```
+Tujuannya adalah mengganti seluruh static route antar-router dengan OSPF.
+
+### Link Baru L7 (Cadangan)
+
+| Link | Router A | Interface A | IP A | Router B | Interface B | IP B | Network |
+|---|---|---|---|---|---|---|---|
+| L7 | R-DC | Se0/3/1 | 10.49.208.1 | R-UTARA | Se0/3/1 | 10.49.208.2 | 10.49.208.0/30 |
+
+Network 10.49.208.0/30 dipilih karena berada di luar seluruh blok yang sudah dialokasikan (LAN, link L1 sampai L6, dan link ISP), dan prefix /30 cukup untuk 2 host.
+
+### Rancangan OSPF
+
+| Router | Router ID | Interface non-passive (kirim hello) | Keterangan |
+|---|---|---|---|
+| R-PUSAT | 1.1.1.1 | Se0/1/0, Se0/2/0, Se0/2/1, Se0/3/0, Se0/3/1 | Satu-satunya yang `default-information originate` |
+| R-DC | 2.2.2.2 | Se0/3/0, Se0/3/1 | Ke R-PUSAT (L1) dan R-UTARA (L7) |
+| R-BARAT | 3.3.3.3 | Se0/3/0 | Ke R-PUSAT (L2) |
+| R-TIMUR | 4.4.4.4 | Se0/3/0 | Ke R-PUSAT (L3) |
+| R-SELATAN | 5.5.5.5 | Se0/3/0 | Ke R-PUSAT (L4) |
+| R-UTARA | 6.6.6.6 | Se0/3/0, Se0/3/1, Gi0/2 | Ke R-PUSAT (L5), R-DC (L7), R-PELABUHAN (L6) |
+| R-PELABUHAN | 7.7.7.7 | Gi0/0 | Ke R-UTARA (L6) |
+
+- Semua router berada di area 0 dengan `network 10.48.0.0 0.1.255.255 area 0`, yang mencakup seluruh LAN dan link internal (10.48.0.0 sampai 10.49.255.255).
+- Pesan OSPF tidak keluar ke LAN pengguna karena `passive-interface default` dipakai di semua router, lalu hanya interface menuju router lain yang dibuka dengan `no passive-interface`. Interface passive tetap diiklankan ke tetangga, tetapi tidak mengirim hello.
+
+### Konfigurasi
+
+#### Menghapus static route terlebih dahulu
+
+- R-PUSAT (default route ke R-ISP tetap dipertahankan):
+
+```
+configure terminal
+no ip route 10.48.0.0 255.255.224.0 10.48.33.2
+no ip route 10.48.32.0 255.255.255.0 10.48.33.2
+no ip route 10.48.64.0 255.255.224.0 10.48.97.2
+no ip route 10.48.96.0 255.255.255.0 10.48.97.2
+no ip route 10.49.0.0 255.255.224.0 10.49.36.2
+no ip route 10.49.32.0 255.255.252.0 10.49.36.2
+no ip route 10.49.64.0 255.255.224.0 10.49.96.130
+no ip route 10.49.96.0 255.255.255.128 10.49.96.130
+no ip route 10.48.128.0 255.255.192.0 10.48.194.2
+no ip route 10.48.192.0 255.255.254.0 10.48.194.2
+no ip route 10.49.128.0 255.255.224.0 10.48.194.2
+no ip route 10.49.160.0 255.255.255.128 10.48.194.2
+no ip route 10.49.160.128 255.255.255.252 10.48.194.2
+end
+```
+
+- R-UTARA:
+
+```
+configure terminal
+no ip route 0.0.0.0 0.0.0.0 10.48.194.1
+no ip route 10.49.128.0 255.255.224.0 10.49.160.130
+no ip route 10.49.160.0 255.255.255.128 10.49.160.130
+end
+```
+
+Default route statis pada router lain dihapus dengan cara yang sama:
+
+| Router | Command |
+|---|---|
+| R-DC | `no ip route 0.0.0.0 0.0.0.0 10.48.33.1` |
+| R-BARAT | `no ip route 0.0.0.0 0.0.0.0 10.48.97.1` |
+| R-TIMUR | `no ip route 0.0.0.0 0.0.0.0 10.49.36.1` |
+| R-SELATAN | `no ip route 0.0.0.0 0.0.0.0 10.49.96.129` |
+| R-PELABUHAN | `no ip route 0.0.0.0 0.0.0.0 10.49.160.129` |
+
+#### Link L7
+
+- R-DC:
+
+```
+configure terminal
+interface Serial0/3/1
+ip address 10.49.208.1 255.255.255.252
+ip ospf cost 1000
+no shutdown
+end
+```
+
+- R-UTARA:
+
+```
+configure terminal
+interface Serial0/3/1
+ip address 10.49.208.2 255.255.255.252
+ip ospf cost 1000
+no shutdown
+end
+```
+Cost 1000 dibuat jauh lebih besar dari jalur utama supaya L7 hanya dipakai saat ada link yang putus. Tanpa pengaturan cost, jalur langsung DC ke UTARA (1 hop) akan menang atas jalur lewat R-PUSAT (2 hop), sehingga L7 menjadi jalur utama, bukan cadangan. Pada sisi DCE kabel serial, clock rate juga ditambahkan.
+
+#### R-PUSAT
+
+```
+configure terminal
+router ospf 1
+router-id 1.1.1.1
+log-adjacency-changes
+passive-interface default
+no passive-interface Serial0/1/0
+no passive-interface Serial0/2/0
+no passive-interface Serial0/2/1
+no passive-interface Serial0/3/0
+no passive-interface Serial0/3/1
+network 10.48.0.0 0.1.255.255 area 0
+default-information originate
+exit
+ip route 0.0.0.0 0.0.0.0 203.0.113.26
+end
+write memory
+```
+
+#### R-DC
+
+```
+configure terminal
+router ospf 1
+router-id 2.2.2.2
+log-adjacency-changes
+passive-interface default
+no passive-interface Serial0/3/0
+no passive-interface Serial0/3/1
+network 10.48.0.0 0.1.255.255 area 0
+end
+write memory
+```
+
+#### R-UTARA
+
+```
+configure terminal
+router ospf 1
+router-id 6.6.6.6
+log-adjacency-changes
+passive-interface default
+no passive-interface Serial0/3/0
+no passive-interface Serial0/3/1
+no passive-interface GigabitEthernet0/2
+network 10.48.0.0 0.1.255.255 area 0
+end
+write memory
+```
+
+#### R-BARAT, R-TIMUR, R-SELATAN
+
+`router-id` dan `no passive-interface` diganti sesuai tabel, yaitu `Serial0/3/0`.
+
+```
+configure terminal
+router ospf 1
+router-id 3.3.3.3
+log-adjacency-changes
+passive-interface default
+no passive-interface Serial0/3/0
+network 10.48.0.0 0.1.255.255 area 0
+end
+write memory
+```
+
+Router ID: R-BARAT 3.3.3.3, R-TIMUR 4.4.4.4, R-SELATAN 5.5.5.5.
+
+#### R-PELABUHAN
+
+```
+configure terminal
+router ospf 1
+router-id 7.7.7.7
+log-adjacency-changes
+passive-interface default
+no passive-interface GigabitEthernet0/0
+network 10.48.0.0 0.1.255.255 area 0
+end
+write memory
+```
 
 # Soal 8
 ```
