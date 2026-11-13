@@ -125,7 +125,9 @@ Range IP dimulai dari alamat setelah Network ID sampai dengan sebelum broadcast 
 ## CIDR
 Berikut ini adalah perhitungan menggunakan metode VLSM.
 
-![alt text](02-CIDR.png)
+![alt text](/asset/02-CIDR.png)
+![](/asset/PEMBAGIAN-CIDR.png)
+![](asset/CIDR-TREE.png)
 
 Penggabungan dilakukan pada subnet yang berdekatan dalam topologi, yaitu LAN dengan link router-nya. Jika kedua subnet memiliki prefix yang sama, keduanya digabung menjadi satu blok dengan prefix yang lebih pendek satu bit. Jika prefix-nya berbeda, diambil blok yang lebih besar, lalu prefix-nya diperpendek satu bit. Proses ini diulang hingga seluruh subnet menyatu menjadi satu blok induk.
 
