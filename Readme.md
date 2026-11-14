@@ -109,7 +109,7 @@ Contoh perhitungan pada Wifi Publik Utara:
 - Host = 11000 host
 - Kebutuhan host = host + 2 -> 11000 + 2 = 11002 host
 - Cari n yang -> 2ⁿ − 2 ≥ kebutuhan host
-- Untuk n = 14 -> 2¹⁴ - 2 ≥ 883 (cukup)
+- Untuk n = 14 -> 2¹⁴ - 2 ≥ 11002 (cukup)
 - Prefix = 32 - n -> 32 - 14 = 18
 Maka, prefix yang didapat adalah /18.
 
